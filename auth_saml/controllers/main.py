@@ -5,10 +5,10 @@
 import functools
 import json
 import logging
+from urllib.parse import quote_plus, unquote_plus, urlencode
 
-import werkzeug.utils
+import werkzeug
 from werkzeug.exceptions import BadRequest
-from werkzeug.urls import url_quote_plus
 
 import odoo
 from odoo import SUPERUSER_ID, _, api, http, models, registry as registry_get
@@ -90,7 +90,7 @@ class SAMLLogin(Home):
         redirect = request.params.get("redirect")
         if redirect:
             params["redirect"] = redirect
-        return "/auth_saml/get_auth_request?%s" % werkzeug.urls.url_encode(params)
+        return "/auth_saml/get_auth_request?%s" % urlencode(params)
 
     @http.route()
     def web_client(self, s_action=None, **kw):
@@ -160,7 +160,7 @@ class AuthSAMLController(http.Controller):
             )
 
         state = {
-            "r": url_quote_plus(redirect),
+            "r": quote_plus(redirect),
         }
         return state
 
@@ -225,7 +225,7 @@ class AuthSAMLController(http.Controller):
                 action = state.get("a")
                 menu = state.get("m")
                 redirect = (
-                    werkzeug.urls.url_unquote_plus(state["r"])
+                    unquote_plus(state["r"])
                     if state.get("r")
                     else False
                 )
