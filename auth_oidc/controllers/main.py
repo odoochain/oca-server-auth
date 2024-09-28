@@ -6,7 +6,9 @@ import base64
 import hashlib
 import logging
 import secrets
-from urllib.parse import urlencode, parse_qs
+from ast import literal_eval
+
+from werkzeug.urls import url_decode, url_encode
 
 from odoo.addons.auth_oauth.controllers.main import OAuthLogin
 
@@ -19,7 +21,7 @@ class OpenIDLogin(OAuthLogin):
         for provider in providers:
             flow = provider.get("flow")
             if flow in ("id_token", "id_token_code"):
-                params = parse_qs(provider["auth_link"].split("?")[-1])
+                params = url_decode(provider["auth_link"].split("?")[-1])
                 # nonce
                 params["nonce"] = secrets.token_urlsafe()
                 # response_type
@@ -42,8 +44,14 @@ class OpenIDLogin(OAuthLogin):
                     if "openid" not in provider["scope"].split():
                         _logger.error("openid connect scope must contain 'openid'")
                     params["scope"] = provider["scope"]
+
+                # append provider specific auth link params
+                if provider["auth_link_params"]:
+                    params_upd = literal_eval(provider["auth_link_params"])
+                    params.update(params_upd)
+
                 # auth link that the user will click
                 provider["auth_link"] = "{}?{}".format(
-                    provider["auth_endpoint"], urlencode(params)
+                    provider["auth_endpoint"], url_encode(params)
                 )
         return providers

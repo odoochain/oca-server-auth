@@ -27,6 +27,7 @@ companies can use their AzureAD login without an guest account.
 - Client ID: Application (client) id
 - Client Secret: Client secret
 - Allowed: yes
+- replace {tenant_id} in urls with your Azure tenant id
 
 or
 
@@ -34,9 +35,12 @@ or
 - Client ID: Application (client) id
 - Client Secret: Client secret
 - Allowed: yes
-- replace {tenant_id} in urls with your Azure tenant id
 
 ![image](../static/description/odoo-azure_ad_multitenant.png)
+
+- Auth Link Params: Add {'prompt':'select_account'} to the auth link to get the account selection screen
+![image](../static/description/oauth-microsoft_azure-select_account.png)
+
 
 ## Setup for Keycloak
 
